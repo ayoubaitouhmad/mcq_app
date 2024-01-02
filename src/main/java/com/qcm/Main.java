@@ -3,6 +3,6 @@ package main.java.com.qcm;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("Lunched");
+        (new MCQApp()).start();
     }
 }
