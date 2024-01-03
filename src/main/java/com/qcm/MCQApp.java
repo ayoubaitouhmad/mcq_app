@@ -14,6 +14,7 @@ public class MCQApp extends JFrame {
 
     public MCQApp() {
 //        init();
+
         (new NavigationMenuExample()).setVisible(true);
 
     }

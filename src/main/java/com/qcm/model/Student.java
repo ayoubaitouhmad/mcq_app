@@ -14,6 +14,16 @@ public class Student extends Model {
     private String major;
     private String grade;
 
+    public String getCin() {
+        return cin;
+    }
+
+    public void setCin(String cin) {
+        this.cin = cin;
+    }
+
+    private String cin;
+
 
     public int getId() {
         return id;
@@ -47,22 +57,38 @@ public class Student extends Model {
         this.grade = grade;
     }
 
+    public Student() {}
+
     public Student(int id, String full_name, String major, String grade) {
         this.id = id;
         this.full_name = full_name;
         this.major = major;
         this.grade = grade;
-
     }
 
     public static Student findByName(String full_name) throws SQLException {
-        Connection connection = connection();
 
+        String query = "SELECT * FROM " + Student.table + " WHERE full_name = ?";
+        String[] binding = {full_name};
+        PreparedStatement stm = query(query, binding);
+        ResultSet resultSet = stm.executeQuery();
+        if (resultSet.next()) {
+            return new Student(
+                    resultSet.getInt("id"),
+                    resultSet.getString("full_name"),
+                    resultSet.getString("major"),
+                    resultSet.getString("grade")
+            );
+        }
+        return null;
+    }
 
-        String query = "SELECT * FROM "+Student.table+" WHERE full_name = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-        preparedStatement.setString(1, full_name.toLowerCase());
-        ResultSet resultSet = preparedStatement.executeQuery();
+    public static Student findByCin(String cin) throws SQLException {
+
+        String query = "SELECT * FROM " + Student.table + " WHERE cin = ?";
+        String[] binding = {cin};
+        PreparedStatement stm = query(query, binding);
+        ResultSet resultSet = stm.executeQuery();
 
         if (resultSet.next()) {
             return new Student(
@@ -75,8 +101,18 @@ public class Student extends Model {
         return null;
     }
 
-
-
+    public Student save() throws SQLException {
+        String insertQuery = "INSERT INTO " + Student.table + " (full_name,major,grade,cin) VALUES (?,?,?,?)";
+        String[] binding = {
+                this.getFull_name(),
+                this.getMajor(),
+                this.getGrade(),
+                this.getCin(),
+        };
+        PreparedStatement stm = query(insertQuery, binding);
+        stm.executeUpdate();
+        return this;
+    }
 
 
 }

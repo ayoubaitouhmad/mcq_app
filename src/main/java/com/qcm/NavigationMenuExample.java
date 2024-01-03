@@ -24,7 +24,7 @@ public class NavigationMenuExample extends JFrame {
 
     private void initializeUI() {
         setTitle("Styled Login and Navigation Example");
-        setSize(400, 300);
+        setSize(700, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -48,18 +48,10 @@ public class NavigationMenuExample extends JFrame {
         cardPanel.setLayout(cardLayout);
 
         // Panel 1: Login Panel
-        studentForm =new LoginForm(
-                "Etudiants Space ",
-                "nom",
-                student()
-        );
+        studentForm =new LoginForm();
 
         // Panel 2: Other Panel
-        professorForm = new LoginForm(
-                "Professor Space ",
-                "nom",
-                student()
-        );
+        professorForm = new LoginForm();
 
 
         cardPanel.add(studentForm, "Login Panel");
@@ -93,45 +85,9 @@ public class NavigationMenuExample extends JFrame {
 
 
 
-    public ActionListener student(){
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                try {
-                    Student student =  Student.findByName(studentForm.getUsernameFieldValue());
-                    if (student!= null) {
-                        JOptionPane.showMessageDialog(NavigationMenuExample.this, student.getFull_name());
-                        JOptionPane.showMessageDialog(NavigationMenuExample.this, student.getId());
-                    } else {
-                        JOptionPane.showMessageDialog(NavigationMenuExample.this, "etudiants does not exist!");
-                    }
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
-                }
-
-            }
-        };
-    }
 
 
-    public ActionListener professor(){
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Professor professor =  Professor.findByName(studentForm.getUsernameFieldValue());
-                    if (professor!= null) {
-                        JOptionPane.showMessageDialog(NavigationMenuExample.this, professor.getFull_name());
-                        JOptionPane.showMessageDialog(NavigationMenuExample.this, professor.getId());
-                    } else {
-                        JOptionPane.showMessageDialog(NavigationMenuExample.this, "professors does not exist!");
-                    }
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        };
-    }
+
+
 
 }
