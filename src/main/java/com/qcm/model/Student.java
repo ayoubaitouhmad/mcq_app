@@ -71,6 +71,12 @@ public class Student extends Model {
         this.grade = grade;
     }
 
+    /***
+     * Find Student by full name
+     * @param full_name
+     * @return
+     * @throws SQLException
+     */
     public static Student findByName(String full_name) throws SQLException {
 
         String query = "SELECT * FROM " + Student.table + " WHERE full_name = ?";
@@ -88,6 +94,12 @@ public class Student extends Model {
         return null;
     }
 
+    /***
+     * Find user by national ID
+     * @param cin
+     * @return
+     * @throws SQLException
+     */
     public static Student findByCin(String cin) throws SQLException {
 
         String query = "SELECT * FROM " + Student.table + " WHERE cin = ?";
@@ -106,6 +118,11 @@ public class Student extends Model {
         return null;
     }
 
+    /***
+     * create new Student
+     * @return
+     * @throws SQLException
+     */
     public Student save() throws SQLException {
         String insertQuery = "INSERT INTO " + Student.table + " (full_name,major,grade,cin) VALUES (?,?,?,?)";
         String[] binding = {
@@ -120,6 +137,11 @@ public class Student extends Model {
     }
 
 
+    /***
+     * Get First Student
+     * @return
+     * @throws SQLException
+     */
     public static Student first() throws SQLException {
         String insertQuery = "select * from  " + Student.table + " limit  1";
         String[] binding = {};
@@ -139,6 +161,11 @@ public class Student extends Model {
     }
 
 
+    /***
+     * Get user quizzes depend on user major
+     * @return
+     * @throws SQLException
+     */
     public  List<Quiz> quizzes() throws SQLException {
         List<Quiz> items = new ArrayList<>();
         for (Quiz quiz:  Quiz.all()) {
@@ -148,4 +175,23 @@ public class Student extends Model {
         }
         return items;
     }
+
+
+    public int quizScore(int quizId) throws SQLException {
+        String insertQuery = "select student_attempts.score from student_attempts join quizzes q on q.id = student_attempts.quiz join students s on s.id = student_attempts.student where s.id = ? and q.id=? limit 1;";
+        String[] binding = {
+                String.valueOf(this.id),
+                String.valueOf(quizId),
+        };
+        PreparedStatement stm = query(insertQuery, binding);
+        stm.executeQuery();
+        ResultSet resultSet = stm.executeQuery();
+
+        if (resultSet.next()) {
+            return  resultSet.getInt("score");
+        }
+       return 0;
+    }
+
+
 }
