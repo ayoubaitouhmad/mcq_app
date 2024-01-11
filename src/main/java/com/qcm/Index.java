@@ -1,6 +1,7 @@
 package main.java.com.qcm;
 
 import main.java.com.qcm.frames.student.Home;
+import main.java.com.qcm.model.Student;
 import main.java.com.qcm.panel.ProfessorPanel;
 import main.java.com.qcm.panel.StudentPanel;
 
@@ -8,8 +9,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class Index extends JFrame {
+
+    private static Index instance;
+
+
+    public static Index getInstance() {
+        if (instance == null) {
+            instance = new Index();
+        }
+        return instance;
+    }
+
+
     private JPanel cardPanel;
     private CardLayout cardLayout;
 

@@ -1,5 +1,6 @@
 package main.java.com.qcm.panel;
 
+import main.java.com.qcm.Index;
 import main.java.com.qcm.frames.professor.Home;
 import main.java.com.qcm.model.Professor;
 import main.java.com.qcm.model.Student;
@@ -19,6 +20,7 @@ public class ProfessorPanel extends JPanel {
     private JComboBox<String> gradeCombobox;
 
     public ProfessorPanel() {
+
         setVisible(true);
         setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
@@ -83,10 +85,10 @@ public class ProfessorPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
 
                 try {
+                    Index.getInstance().setVisible(false);
                     Professor professor = Professor.findByCin(cinField.getText());
                     if (professor != null) {
-                        Home home = new Home();
-
+                        new Home(professor);
                     } else {
 
                         if (
@@ -102,8 +104,7 @@ public class ProfessorPanel extends JPanel {
                             createdProfessor.setCin(cinField.getText());
                             createdProfessor.save();
 
-                            Home home = new Home();
-                            home.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+                            new Home(createdProfessor);
 
                         }
 

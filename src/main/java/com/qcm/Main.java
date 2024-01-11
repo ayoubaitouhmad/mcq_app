@@ -9,10 +9,7 @@ import java.sql.SQLException;
 public class Main {
 
     public static void main(String[] args) throws SQLException {
-//        Home.getInstance(Student.first() , false);
-        new Home(
-                Professor.first()
-        );
+        Index.getInstance();
     }
 
 }

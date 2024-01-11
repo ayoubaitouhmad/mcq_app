@@ -1,5 +1,6 @@
 package main.java.com.qcm.frames.professor;
 
+import main.java.com.qcm.Index;
 import main.java.com.qcm.model.Professor;
 import main.java.com.qcm.model.Quiz;
 import main.java.com.qcm.model.Student;
@@ -83,12 +84,24 @@ public class Home extends JFrame {
         JMenu menu = new JMenu("Menu");
         loginItem = new JMenuItem("List des QCMS");
          studentMenu = new JMenuItem("lIST DES USERS");
+        JMenuItem  back = new JMenuItem("back");
+        back.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               dispose();
+                Index.getInstance().setVisible(true);
+            }
+        });
         JMenuItem exitItem = new JMenuItem("Exit");
         menu.add(loginItem);
         menu.add(studentMenu);
+        menu.add(back);
         menu.addSeparator();
         menu.add(exitItem);
         menuBar.add(menu);
+
+
+
     }
 
     private void professorInfo() {
