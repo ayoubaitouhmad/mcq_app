@@ -70,7 +70,7 @@ public class StudentPanel extends JPanel {
         add(filiereLabel, gbc);
 
 
-        String[] majorOptions = {"informatique", "médicale", "Option C"};
+        String[] majorOptions = {"developer"};
         majorCombobox = createStyledComboBox(majorOptions);
         gbc.gridx = 0;
         gbc.gridy = 3;
