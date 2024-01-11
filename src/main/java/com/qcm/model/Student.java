@@ -1,6 +1,5 @@
 package main.java.com.qcm.model;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +15,8 @@ public class Student extends Model {
     private String full_name;
     private String major;
     private String grade;
+
+
 
 
     public String getCin() {
@@ -70,6 +71,8 @@ public class Student extends Model {
         this.major = major;
         this.grade = grade;
     }
+
+
 
     /***
      * Find Student by full name
@@ -191,6 +194,26 @@ public class Student extends Model {
             return  resultSet.getInt("score");
         }
        return 0;
+    }
+
+    public static List<Student> all() throws SQLException {
+        String insertQuery = "select * from  " + Student.table;
+        String[] binding = {};
+        PreparedStatement stm = query(insertQuery, binding);
+        stm.executeQuery();
+        ResultSet resultSet = stm.executeQuery();
+
+        List<Student> items = new ArrayList<>();
+
+        while (resultSet.next()) {
+            items.add(  new Student(
+                    resultSet.getInt("id"),
+                    resultSet.getString("full_name"),
+                    resultSet.getString("major"),
+                    resultSet.getString("grade")
+            ));
+        }
+        return items;
     }
 
 
