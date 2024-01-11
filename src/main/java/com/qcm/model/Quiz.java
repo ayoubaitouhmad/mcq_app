@@ -126,5 +126,33 @@ public class Quiz extends Model {
         return "select  * from questions join  quiz_questions quiz_question on questions.id = quiz_question.question join db_mcq.quizzes quizze on quiz_question.quiz = quizze.id where  quizze.id=? ";
     }
 
+    private static String successfulStudentsQuery() {
+        return "select s.* , student_attempts.score from student_attempts join db_mcq.students s on s.id = student_attempts.student join db_mcq.quizzes q on q.id = student_attempts.quiz where q.id = ?";
+    }
+
+    public List<Student> getSuccessfulStudents() throws SQLException {
+        String insertQuery = successfulStudentsQuery();
+        String[] binding = {
+                String.valueOf(this.id)
+        };
+        PreparedStatement stm = query(insertQuery, binding);
+        stm.executeQuery();
+        ResultSet resultSet = stm.executeQuery();
+
+        List<Student> items = new ArrayList<>();
+
+        while (resultSet.next()) {
+            items.add(new Student(
+                    resultSet.getInt("id"),
+                    resultSet.getString("full_name"),
+                    resultSet.getString("major"),
+                    resultSet.getString("grade")
+            ));
+        }
+
+        return items;
+
+    }
+
 
 }
