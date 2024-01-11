@@ -17,9 +17,14 @@ public class Quiz extends Model {
     private String targetCategory;
 
 
-
-
-    public String getName() {
+    public String getName(Student student) throws SQLException {
+        int score = 0;
+        if (student != null) {
+            score = student.quizScore(this.getId());
+        }
+        if (score != 0) {
+            return title + "    " + score;
+        }
         return title;
     }
 
@@ -73,32 +78,31 @@ public class Quiz extends Model {
     }
 
 
-
     public static List<Quiz> all() throws SQLException {
-        String insertQuery = "select * from  " + Quiz.table ;
+        String insertQuery = "select * from  " + Quiz.table;
         String[] binding = {};
         PreparedStatement stm = query(insertQuery, binding);
         stm.executeQuery();
         ResultSet resultSet = stm.executeQuery();
 
-         List<Quiz> items = new ArrayList<>();
+        List<Quiz> items = new ArrayList<>();
 
-        while  (resultSet.next()) {
-           items.add(new Quiz(
-                   resultSet.getInt("id"),
-                   Professor.find( resultSet.getInt("professor")),
-                   resultSet.getString("title"),
-                   resultSet.getBoolean("hasMultiChoices"),
-                   resultSet.getString("targetCategory")
-           ));
+        while (resultSet.next()) {
+            items.add(new Quiz(
+                    resultSet.getInt("id"),
+                    Professor.find(resultSet.getInt("professor")),
+                    resultSet.getString("title"),
+                    resultSet.getBoolean("hasMultiChoices"),
+                    resultSet.getString("targetCategory")
+            ));
         }
-        return  items;
+        return items;
 
     }
 
 
     public List<Question> getQuestions() throws SQLException {
-        String insertQuery = questionsQuery() ;
+        String insertQuery = questionsQuery();
         String[] binding = {
                 String.valueOf(this.id)
         };
@@ -106,23 +110,21 @@ public class Quiz extends Model {
         stm.executeQuery();
         ResultSet resultSet = stm.executeQuery();
 
-         List<Question> items = new ArrayList<>();
+        List<Question> items = new ArrayList<>();
 
-        while  (resultSet.next()) {
-           items.add(new Question(
-                   resultSet.getInt("id"),
-                   resultSet.getString("question")
-           ));
+        while (resultSet.next()) {
+            items.add(new Question(
+                    resultSet.getInt("id"),
+                    resultSet.getString("question")
+            ));
         }
-        return  items;
+        return items;
 
     }
 
-    private static String questionsQuery(){
-        return  "select  * from questions join  quiz_questions quiz_question on questions.id = quiz_question.question join db_mcq.quizzes quizze on quiz_question.quiz = quizze.id where  quizze.id=? ";
+    private static String questionsQuery() {
+        return "select  * from questions join  quiz_questions quiz_question on questions.id = quiz_question.question join db_mcq.quizzes quizze on quiz_question.quiz = quizze.id where  quizze.id=? ";
     }
-
-
 
 
 }
