@@ -1,6 +1,7 @@
 package main.java.com.qcm;
 
 import main.java.com.qcm.frames.student.Home;
+import main.java.com.qcm.panel.ProfessorPanel;
 import main.java.com.qcm.panel.StudentPanel;
 
 import javax.swing.*;
@@ -14,7 +15,7 @@ public class Index extends JFrame {
 
 
     private StudentPanel studentForm;
-    private StudentPanel professorForm;
+    private ProfessorPanel professorForm;
 
     public Index() {
 
@@ -47,21 +48,21 @@ public class Index extends JFrame {
         // Panel 1: Login Panel
         studentForm =new StudentPanel();
         // Panel 2: Other Panel
-        professorForm = new StudentPanel();
-        cardPanel.add(studentForm, "Login Panel");
-        cardPanel.add(professorForm, "Other Panel");
+        professorForm = new ProfessorPanel();
+        cardPanel.add(studentForm, "STUDENT");
+        cardPanel.add(professorForm, "PROFESSOR");
         add(cardPanel);
         loginItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cardLayout.show(cardPanel, "Login Panel");
+                cardLayout.show(cardPanel, "STUDENT");
             }
         });
 
         otherPanelItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cardLayout.show(cardPanel, "Other Panel");
+                cardLayout.show(cardPanel, "PROFESSOR");
             }
         });
 
