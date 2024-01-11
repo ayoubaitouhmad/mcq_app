@@ -6,6 +6,7 @@ import main.java.com.qcm.frames.student.*;
 import main.java.com.qcm.model.Question;
 import main.java.com.qcm.model.Quiz;
 import main.java.com.qcm.model.Student;
+import main.java.com.qcm.util.Sys;
 
 import javax.swing.*;
 import java.sql.SQLException;
@@ -13,6 +14,7 @@ import java.sql.SQLException;
 public class Main {
 
     public static void main(String[] args) throws SQLException {
-        new StartQuiz(Quiz.all().get(0) , Student.first());
+        Home.getInstance(Student.first() , false);
     }
+
 }
