@@ -66,5 +66,21 @@ public class Professor extends  Model {
         return null;
     }
 
+    public static Professor find(int id) throws SQLException {
+        Connection connection = connection();
+        String query = "SELECT * FROM "+Professor.table+" WHERE id = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1, id);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        if (resultSet.next()) {
+            return new Professor(
+                    resultSet.getInt("id"),
+                    resultSet.getString("full_name"),
+                    resultSet.getString("speciality")
+            );
+        }
+        return null;
+    }
 
 }

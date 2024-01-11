@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Student extends Model {
 
@@ -13,6 +16,7 @@ public class Student extends Model {
     private String full_name;
     private String major;
     private String grade;
+
 
     public String getCin() {
         return cin;
@@ -57,7 +61,8 @@ public class Student extends Model {
         this.grade = grade;
     }
 
-    public Student() {}
+    public Student() {
+    }
 
     public Student(int id, String full_name, String major, String grade) {
         this.id = id;
@@ -115,4 +120,32 @@ public class Student extends Model {
     }
 
 
+    public static Student first() throws SQLException {
+        String insertQuery = "select * from  " + Student.table + " limit  1";
+        String[] binding = {};
+        PreparedStatement stm = query(insertQuery, binding);
+        stm.executeQuery();
+        ResultSet resultSet = stm.executeQuery();
+
+        if (resultSet.next()) {
+            return new Student(
+                    resultSet.getInt("id"),
+                    resultSet.getString("full_name"),
+                    resultSet.getString("major"),
+                    resultSet.getString("grade")
+            );
+        }
+        return new Student();
+    }
+
+
+    public  List<Quiz> quizzes() throws SQLException {
+        List<Quiz> items = new ArrayList<>();
+        for (Quiz quiz:  Quiz.all()) {
+            if(Objects.equals(quiz.targetCategory(), this.getMajor())){
+                items.add(quiz);
+            }
+        }
+        return items;
+    }
 }

@@ -12,12 +12,6 @@ public class Model {
     private static final String primaryKey = "id";
 
 
-
-
-
-
-
-
     public static Connection connection() {
         try {
             return DatabaseConnection.getConnection();
@@ -27,15 +21,20 @@ public class Model {
         }
         return null;
     }
-    public static PreparedStatement query(String query, String[] binding  ) throws SQLException {
+
+    public static PreparedStatement query(String query, String[] binding) throws SQLException {
         Connection connection = connection();
+        assert connection != null;
         PreparedStatement preparedStatement = connection.prepareStatement(query);
 
-        int x = 1;
-        for (int i = 0; i < binding.length ; i++) {
-            preparedStatement.setString(x, binding[i]);
-            ++x;
+        if (binding.length > 0) {
+            int x = 1;
+            for (int i = 0; i < binding.length; i++) {
+                preparedStatement.setString(x, binding[i]);
+                ++x;
+            }
         }
+
         return preparedStatement;
     }
 

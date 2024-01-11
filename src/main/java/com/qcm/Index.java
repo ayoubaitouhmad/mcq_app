@@ -1,24 +1,23 @@
 package main.java.com.qcm;
 
-import main.java.com.qcm.model.Professor;
-import main.java.com.qcm.model.Student;
-import main.java.com.qcm.panel.LoginForm;
+import main.java.com.qcm.frames.student.Home;
+import main.java.com.qcm.panel.StudentPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 
-public class NavigationMenuExample extends JFrame {
+public class Index extends JFrame {
     private JPanel cardPanel;
     private CardLayout cardLayout;
 
 
-    private LoginForm studentForm;
-    private LoginForm professorForm;
+    private StudentPanel studentForm;
+    private StudentPanel professorForm;
 
-    public NavigationMenuExample() {
+    public Index() {
+
         initializeUI();
     }
 
@@ -42,23 +41,16 @@ public class NavigationMenuExample extends JFrame {
         menu.add(exitItem);
 
         menuBar.add(menu);
-
         cardPanel = new JPanel();
         cardLayout = new CardLayout();
         cardPanel.setLayout(cardLayout);
-
         // Panel 1: Login Panel
-        studentForm =new LoginForm();
-
+        studentForm =new StudentPanel();
         // Panel 2: Other Panel
-        professorForm = new LoginForm();
-
-
+        professorForm = new StudentPanel();
         cardPanel.add(studentForm, "Login Panel");
         cardPanel.add(professorForm, "Other Panel");
-
         add(cardPanel);
-
         loginItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

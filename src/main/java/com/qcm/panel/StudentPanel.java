@@ -1,7 +1,6 @@
 package main.java.com.qcm.panel;
 
-import main.java.com.qcm.NavigationMenuExample;
-import main.java.com.qcm.SelectExample;
+import main.java.com.qcm.frames.student.Home;
 import main.java.com.qcm.model.Student;
 
 import javax.swing.*;
@@ -9,10 +8,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.Locale;
-import java.util.Objects;
 
-public class LoginForm extends JPanel {
+public class StudentPanel extends JPanel {
 
     private GridBagConstraints gbc;
     private JTextField cinField;
@@ -20,7 +17,7 @@ public class LoginForm extends JPanel {
     private JComboBox<String> majorCombobox;
     private JComboBox<String> gradeCombobox;
 
-    public LoginForm() {
+    public StudentPanel() {
         setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
         setBackground(new Color(240, 240, 240));
@@ -73,7 +70,7 @@ public class LoginForm extends JPanel {
         add(filiereLabel, gbc);
 
 
-        String[] majorOptions = {"Option A", "Option B", "Option C"};
+        String[] majorOptions = {"informatique", "médicale", "Option C"};
         majorCombobox = createStyledComboBox(majorOptions);
         gbc.gridx = 0;
         gbc.gridy = 3;
@@ -145,8 +142,12 @@ public class LoginForm extends JPanel {
                     Student student = Student.findByCin(cinField.getText());
                     if (student != null) {
 
-                        JOptionPane.showMessageDialog(LoginForm.this, student.getFull_name());
-                        JOptionPane.showMessageDialog(LoginForm.this, student.getId());
+
+                        Home home = new Home(student);
+                        home.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+
+//                        JOptionPane.showMessageDialog(StudentPanel.this, student.getFull_name());
+//                        JOptionPane.showMessageDialog(StudentPanel.this, student.getId());
                     } else {
 
                         if (
@@ -155,8 +156,9 @@ public class LoginForm extends JPanel {
                                         gradeCombobox.getSelectedItem().toString().isEmpty() ||
                                         majorCombobox.getSelectedItem().toString().isEmpty()
                         ) {
-                            JOptionPane.showMessageDialog(LoginForm.this, "all filed are required");
+                            JOptionPane.showMessageDialog(StudentPanel.this, "all filed are required");
                         } else {
+
                             Student createdStudent = new Student();
                             createdStudent.setFull_name(nomField.getText());
                             createdStudent.setCin(cinField.getText());
@@ -165,7 +167,9 @@ public class LoginForm extends JPanel {
                             createdStudent.setMajor(majorCombobox.getSelectedItem().toString());
                             createdStudent.save();
 
-                            JOptionPane.showMessageDialog(LoginForm.this, "student created succesfully!");
+                            Home home = new Home(createdStudent);
+                            home.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+//                            JOptionPane.showMessageDialog(StudentPanel.this, "student created succesfully!");
                         }
 
                     }
