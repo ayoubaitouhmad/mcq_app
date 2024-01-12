@@ -1,65 +1,177 @@
 package main.java.com.qcm.frames.student;
 
-import main.java.com.qcm.DatabaseListExample;
+import main.java.com.qcm.Index;
 import main.java.com.qcm.model.Quiz;
 import main.java.com.qcm.model.Student;
-import main.java.com.qcm.panel.StudentPanel;
-import main.java.com.qcm.util.Sys;
+import main.java.com.qcm.util.Component;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Home extends JFrame {
 
-    private static Home instance;
+
     private Student student;
 
-    private DefaultListModel<String> listModel;
-    private List<Quiz> items;
-    private JList<String> itemList;
-    private List<Quiz> quizzes;
+    private List<Quiz> studentQuizzes;
     private JPanel mainPanel;
 
-    public static Home getInstance(Student student , boolean refresh ) throws SQLException {
-        if(refresh){
-            return  new Home(student);
-        }
-        if (instance == null) {
-            instance = new Home(student);
-        }
-        return instance;
-    }
 
-    public void refresh() throws SQLException {
-        fillData();
-    }
+    JMenuItem allQuizzesMenuItem;
+    JMenuItem myQuizzesMenuItem;
+
+    public static JPanel cardPanel;
+    public static CardLayout cardLayout;
+    private JPanel quizListPanel;
+    private JPanel startQuizPanel;
+    private JPanel studentQuizzesPanel;
 
 
     public Home(Student student) throws SQLException {
         this.student = student;
-        setTitle("Styled Login and Navigation Example");
-        setSize(700, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        this.studentQuizzes = student.getQuizzesByStudentMajor();
+        Component.jFrame(this, "Student Dashboard");
+        menu();
+        studentInfo();
+        quizzes();
+        studentQuizzesPanelInit();
 
 
-        // Create a panel for user information
-        JPanel userInfoPanel = new JPanel(new GridLayout(3, 3));
-        userInfoPanel.setBorder(BorderFactory.createTitledBorder("User Information"));
+        cardPanel = new JPanel();
+        cardLayout = new CardLayout();
+        cardPanel.setLayout(cardLayout);
 
-        JLabel nameLabel = new JLabel("Name:");
-        JLabel nameValueLabel = new JLabel(student.getFull_name()); // Set the initial value
+        startQuizPanel = new StartQuiz(studentQuizzes.getFirst(), student);
+        cardPanel.add(quizListPanel, "QUIZZES");
+        cardPanel.add(startQuizPanel, "START_QUIZ");
+        cardPanel.add(studentQuizzesPanel, "STUDENT_QUIZZES");
 
-        JLabel ageLabel = new JLabel("Level:");
-        JLabel ageValueLabel = new JLabel(student.getMajor()); // Set the initial value
+        add(cardPanel);
 
-        JLabel gradeLabel = new JLabel("Grade:");
-        JLabel gradeValueLabel = new JLabel(student.getGrade()); // Set the initial value
+        setVisible(true);
+    }
+
+    private void studentQuizzesPanelInit() throws SQLException {
+        studentQuizzesPanel = new JPanel();
+        studentQuizzesPanel.setLayout(new GridLayout(3, 3));
+        studentQuizzesPanel.setBorder(BorderFactory.createTitledBorder("QCMs de filiere " + this.student.getMajor()));
+        studentQuizzesPanel.setVisible(true);
+
+
+        // Create a non-editable DefaultTableModel
+        DefaultTableModel tableModel = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Make all cells non-editable
+                return false;
+            }
+        };
+        tableModel.addColumn("Reference");
+        tableModel.addColumn("title");
+        tableModel.addColumn("date");
+        tableModel.addColumn("score");
+        tableModel.addColumn("Decision");
+
+        for (Student student : student.getStudentQuizzesHistorique()) {
+            Object[] rowData = {
+                    "#" + student.quiz.getId(),
+                    student.quiz.getTitle(),
+                    student.studentAttempt.getCreatedAt(),
+                    student.studentAttempt.getScore(),
+                    student.studentAttempt.result(),
+            };
+            tableModel.addRow(rowData);
+        }
+
+
+        JTable dataTable = new JTable(tableModel);
+
+        dataTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    int selectedRow = dataTable.getSelectedRow();
+                    if (selectedRow != -1) {
+
+                    }
+                }
+            }
+        });
+
+
+        JScrollPane scrollPane = new JScrollPane(dataTable);
+        studentQuizzesPanel.add(scrollPane, BorderLayout.CENTER);
+    }
+
+    private void menu() {
+        JMenuBar menuBar = new JMenuBar();
+        setJMenuBar(menuBar);
+        JMenu menu = new JMenu("Menu");
+        allQuizzesMenuItem = new JMenuItem("List des QCMS");
+        myQuizzesMenuItem = new JMenuItem("mes QCMS");
+        JMenuItem back = new JMenuItem("back");
+        back.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                Index.getInstance().setVisible(true);
+            }
+        });
+
+        allQuizzesMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(cardPanel, "QUIZZES");
+            }
+        });
+
+        myQuizzesMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    studentQuizzesPanelInit();
+                    cardPanel.remove(2);
+                    cardPanel.add(studentQuizzesPanel, "STUDENT_QUIZZES");
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+                cardLayout.show(cardPanel, "STUDENT_QUIZZES");
+            }
+        });
+
+
+        menu.add(allQuizzesMenuItem);
+        menu.add(myQuizzesMenuItem);
+        menu.addSeparator();
+        menu.add(back);
+        menuBar.add(menu);
+
+
+    }
+
+
+    private void studentInfo() {
+        JPanel userInfoPanel = new JPanel(new GridLayout(4, 2));
+        userInfoPanel.setBorder(BorderFactory.createTitledBorder("Professor Information"));
+
+        JLabel nameLabel = new JLabel("nom:");
+        JLabel nameValueLabel = new JLabel(student.getFull_name());
+
+        JLabel ageLabel = new JLabel("cin:");
+        JLabel ageValueLabel = new JLabel(student.getCin());
+
+        JLabel levelLabel = new JLabel("level:");
+        JLabel levelValueLabel = new JLabel(student.getGrade());
+
+        JLabel majorLabel = new JLabel("filiere:");
+        JLabel majorValueLabel = new JLabel(student.getMajor());
 
 
         userInfoPanel.add(nameLabel);
@@ -67,93 +179,78 @@ public class Home extends JFrame {
         userInfoPanel.add(ageLabel);
         userInfoPanel.add(ageValueLabel);
 
-        userInfoPanel.add(gradeLabel);
-        userInfoPanel.add(gradeValueLabel);
+        userInfoPanel.add(levelLabel);
+        userInfoPanel.add(levelValueLabel);
+        userInfoPanel.add(majorLabel);
+        userInfoPanel.add(majorValueLabel);
 
-
-      mainPanel = new JPanel(new BorderLayout());
+        mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(userInfoPanel, BorderLayout.NORTH);
 
-        fillData();
-
-
-//        itemList.setCellRenderer(new CustomBackgroundRenderer());
-//        changeBackgroundColor(itemList, 2, Color.RED);
-
-
-
-        // Set the main panel as the content pane
         setContentPane(mainPanel);
-
-
-        // Display the frame
-        setVisible(true);
     }
 
+    public void quizzes() throws SQLException {
+        quizListPanel = new JPanel();
+        quizListPanel.setLayout(new GridLayout(3, 3));
+        quizListPanel.setBorder(BorderFactory.createTitledBorder("QCMs de filiere " + this.student.getMajor()));
+        quizListPanel.setVisible(true);
 
-    private  void fillData() throws SQLException {
 
-        quizzes = student.quizzes();
-        listModel = new DefaultListModel<>();
+        // Create a non-editable DefaultTableModel
+        DefaultTableModel tableModel = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Make all cells non-editable
+                return false;
+            }
+        };
+        tableModel.addColumn("reference");
+        tableModel.addColumn("title");
+        tableModel.addColumn("targetCategory");
 
-        for (Quiz quiz : quizzes) {
-            listModel.addElement(quiz.getName(
-                    student
-            ));
+        for (Quiz quiz : studentQuizzes) {
+            Object[] rowData = {"#" + quiz.getId(), quiz.getTitle(), quiz.targetCategory()};
+            tableModel.addRow(rowData);
         }
 
-        itemList = new JList<>(listModel);
-        itemList.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                int selectedIndex = itemList.getSelectedIndex();
-                try {
-                    int score = student.quizScore(quizzes.get(selectedIndex).getId());
-                    System.out.println(student.quizScore(quizzes.get(selectedIndex).getId()));
-                    if (score == 0) {
 
-                        Home.getInstance(student,false).setVisible(false);
-                        new StartQuiz(
-                                quizzes.get(selectedIndex),
-                                student
-                        );
+        JTable dataTable = new JTable(tableModel);
 
-                    } else {
-                        JOptionPane.showMessageDialog(Home.this, "Already take the quiz , score:" + score);
+        dataTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    int selectedRow = dataTable.getSelectedRow();
+                    if (selectedRow != -1) {
+                        try {
+                            Quiz quiz = studentQuizzes.get(selectedRow);
+                            if (!student.hasStudentTakeQuiz(quiz.getId())) {
+                                if (!quiz.getQuestions().isEmpty()) {
+                                    startQuizPanel = new StartQuiz(quiz, student);
+                                    cardPanel.remove(1);
+                                    cardPanel.add(startQuizPanel, "START_QUIZ");
+                                    cardLayout.show(cardPanel, "START_QUIZ");
+                                } else {
+                                    Component.alert(Home.this, "Quiz Doest have any questios");
+                                }
+                            } else {
+                                Component.alert(Home.this, "You already take quiz and your score is  " + student.quizScore(quiz.getId()));
+                            }
+
+                        } catch (SQLException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
                 }
-
             }
         });
 
-        mainPanel.add(new JScrollPane(itemList), BorderLayout.CENTER);
+
+        JScrollPane scrollPane = new JScrollPane(dataTable);
+        quizListPanel.add(scrollPane, BorderLayout.CENTER);
+
     }
 
-    private static void changeBackgroundColor(JList<String> jList, int index, Color backgroundColor) {
-        DefaultListModel<String> model = (DefaultListModel<String>) jList.getModel();
-        model.getElementAt(index);
-        jList.repaint();
-    }
-
-    static class CustomBackgroundRenderer extends DefaultListCellRenderer {
-        @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                      boolean isSelected, boolean cellHasFocus) {
-            Component component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-            // Change background color for specific items
-            if (value != null && value.toString().endsWith("Item 2")) {
-                component.setBackground(Color.YELLOW);
-            } else if (value != null && value.toString().endsWith("Item 5")) {
-                component.setBackground(Color.GREEN);
-            } else {
-                // Reset background color for other items
-                component.setBackground(list.getBackground());
-            }
-
-            return component;
-        }
-    }
 
 }

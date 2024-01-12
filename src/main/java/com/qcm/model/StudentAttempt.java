@@ -15,6 +15,7 @@ public class StudentAttempt extends Model {
     private Student student;
     private Quiz quiz;
 
+
     public int getId() {
         return id;
     }
@@ -55,20 +56,29 @@ public class StudentAttempt extends Model {
         this.quiz = quiz;
     }
 
-    public StudentAttempt( int score,Student student , Quiz quiz) {
+    public StudentAttempt(int score, Student student, Quiz quiz) {
         this.score = score;
         this.student = student;
         this.quiz = quiz;
 
     }
 
-//    public StudentAttempt(int id, int score, String createdAt, Student student) {
-//        this.id = id;
-//        this.score = score;
-//        this.createdAt = createdAt;
-//        this.student = student;
-//    }
+    public StudentAttempt(int id, int score, Student student, Quiz quiz) {
+        this.id = id;
+        this.score = score;
+        this.student = student;
+        this.quiz = quiz;
 
+    }
+
+    public StudentAttempt(int id, int score, Student student, Quiz quiz, String createdAt) {
+        this.id = id;
+        this.score = score;
+        this.student = student;
+        this.createdAt = createdAt;
+        this.quiz = quiz;
+
+    }
 
 
     public void save() throws SQLException {
@@ -82,4 +92,49 @@ public class StudentAttempt extends Model {
         stm.executeUpdate();
     }
 
+    public static List<StudentAttempt> all() throws SQLException {
+        String insertQuery = "select * from  " + StudentAttempt.table;
+        String[] binding = {};
+        PreparedStatement stm = query(insertQuery, binding);
+        stm.executeQuery();
+        ResultSet resultSet = stm.executeQuery();
+
+        List<StudentAttempt> items = new ArrayList<>();
+
+        while (resultSet.next()) {
+            items.add(new StudentAttempt(
+                    resultSet.getInt("id"),
+                    resultSet.getInt("score"),
+                    Student.find(resultSet.getInt("student")),
+                    Quiz.find(resultSet.getInt("quiz")),
+                    resultSet.getString("created_at")
+
+            ));
+        }
+        return items;
+
+    }
+
+
+    public static StudentAttempt find(int studentAttemptId) throws SQLException {
+        for (StudentAttempt studentAttempt : all()) {
+            if (studentAttempt.getId() == studentAttemptId) {
+                return studentAttempt;
+            }
+        }
+        return null;
+    }
+
+
+    /***
+     * Check if student passes the quiz
+     * @return
+     * @throws SQLException
+     */
+    public String result() throws SQLException {
+        if (score >= quiz.getQuestions().size()/2) {
+            return "admis";
+        }
+        return "Rachete";
+    }
 }

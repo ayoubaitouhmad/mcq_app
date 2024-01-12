@@ -17,6 +17,17 @@ public class Student extends Model {
     private String grade;
 
 
+    public Quiz quiz;
+    public StudentAttempt studentAttempt;
+
+    public static Student find(int studentId) throws SQLException {
+        for (Student student : all()) {
+            if (student.getId() == studentId) {
+                return student;
+            }
+        }
+        return null;
+    }
 
 
     public String getCin() {
@@ -65,11 +76,24 @@ public class Student extends Model {
     public Student() {
     }
 
-    public Student(int id, String full_name, String major, String grade) {
+    public Student(int id, String full_name, String major, String grade, String cin) {
         this.id = id;
         this.full_name = full_name;
         this.major = major;
         this.grade = grade;
+        this.cin = cin;
+    }
+    public Student(int id, String fullName, String major, String grade,String cin, Quiz quiz, StudentAttempt studentAttempt) {
+        this.id = id;
+        this.full_name = fullName;
+        this.major = major;
+        this.grade = grade;
+        this.cin = cin;
+
+        this.studentAttempt = studentAttempt;
+        this.quiz = quiz;
+
+
     }
 
 
@@ -91,7 +115,8 @@ public class Student extends Model {
                     resultSet.getInt("id"),
                     resultSet.getString("full_name"),
                     resultSet.getString("major"),
-                    resultSet.getString("grade")
+                    resultSet.getString("grade"),
+                    resultSet.getString("cin")
             );
         }
         return null;
@@ -115,7 +140,8 @@ public class Student extends Model {
                     resultSet.getInt("id"),
                     resultSet.getString("full_name"),
                     resultSet.getString("major"),
-                    resultSet.getString("grade")
+                    resultSet.getString("grade"),
+                    resultSet.getString("cin")
             );
         }
         return null;
@@ -157,7 +183,8 @@ public class Student extends Model {
                     resultSet.getInt("id"),
                     resultSet.getString("full_name"),
                     resultSet.getString("major"),
-                    resultSet.getString("grade")
+                    resultSet.getString("grade"),
+                    resultSet.getString("cin")
             );
         }
         return new Student();
@@ -169,7 +196,7 @@ public class Student extends Model {
      * @return
      * @throws SQLException
      */
-    public  List<Quiz> quizzes() throws SQLException {
+    public  List<Quiz> getQuizzesByStudentMajor() throws SQLException {
         List<Quiz> items = new ArrayList<>();
         for (Quiz quiz:  Quiz.all()) {
             if(Objects.equals(quiz.targetCategory(), this.getMajor())){
@@ -177,6 +204,41 @@ public class Student extends Model {
             }
         }
         return items;
+    }
+
+    /***
+     * Get user quizzes depend on user major
+     * @return
+     * @throws SQLException
+     */
+    public  List<Student> getStudentQuizzesHistorique() throws SQLException {
+        String insertQuery = studentQuizzesHistoriqueQuery();
+        String[] binding = {
+                String.valueOf(this.id),
+        };
+        PreparedStatement stm = query(insertQuery, binding);
+        stm.executeQuery();
+        ResultSet resultSet = stm.executeQuery();
+        List<Student> items = new ArrayList<>();
+        while (resultSet.next()) {
+            items.add(new Student(
+                    resultSet.getInt("id"),
+                    resultSet.getString("full_name"),
+                    resultSet.getString("major"),
+                    resultSet.getString("grade"),
+                    resultSet.getString("cin"),
+                    Quiz.find( resultSet.getInt("quiz_id")),
+                    StudentAttempt.find(resultSet.getInt("student_attempt_id"))
+            ));
+        }
+
+        return  items;
+
+    }
+
+
+    private static String studentQuizzesHistoriqueQuery(){
+        return "select students.* , q.id  as quiz_id,sa.id as student_attempt_id from  students join db_mcq.student_attempts sa on students.id = sa.student join db_mcq.quizzes q on q.id = sa.quiz where students.id=?";
     }
 
 
@@ -210,11 +272,28 @@ public class Student extends Model {
                     resultSet.getInt("id"),
                     resultSet.getString("full_name"),
                     resultSet.getString("major"),
-                    resultSet.getString("grade")
+                    resultSet.getString("grade"),
+                    resultSet.getString("cin")
             ));
         }
         return items;
     }
 
 
+    /***
+     * Check if student has already passe the quiz
+     * this will not work  if the student has the right to take same quiz multiple times
+     * @param quizId
+     * @return
+     * @throws SQLException
+     */
+    public boolean hasStudentTakeQuiz(int quizId) throws SQLException {
+        for (Student student : getStudentQuizzesHistorique()){
+            if(student.quiz.getId() == quizId){
+                return  true;
+            }
+
+        }
+        return  false;
+    }
 }

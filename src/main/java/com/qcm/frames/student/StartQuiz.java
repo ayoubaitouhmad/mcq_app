@@ -1,6 +1,7 @@
 package main.java.com.qcm.frames.student;
 
 import main.java.com.qcm.model.*;
+import main.java.com.qcm.util.Component;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class StartQuiz extends JFrame {
+public class StartQuiz extends JPanel {
 
     private List<Question> questions;
     private JRadioButton radioButtons[] = new JRadioButton[4];
@@ -34,10 +35,7 @@ public class StartQuiz extends JFrame {
     ) throws SQLException {
 
 
-        setTitle("Gender Selection");
-        setSize(700, 500);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setBorder(BorderFactory.createTitledBorder(quiz.getTitle()));
         setVisible(true);
         setLayout(new FlowLayout());
 
@@ -47,16 +45,11 @@ public class StartQuiz extends JFrame {
         currentQuestionIndex = -1;
         this.questions = this.quiz.getQuestions();
 
-        if (questions == null || questions.isEmpty()) {
-            setVisible(false);
-            Home.getInstance(student, false).setVisible(true);
-            JOptionPane.showMessageDialog(this, "The selected quiz doest not have any questions");
-            dispose();
 
-        } else {
-            initializeComponents();
 
-        }
+
+
+        initializeComponents();
 
     }
 
@@ -136,23 +129,16 @@ public class StartQuiz extends JFrame {
 
     private Question currentQuestion() throws SQLException {
 
-
         if (currentQuestionIndex < questions.size()) {
             return questions.get(currentQuestionIndex);
         }
-        System.out.println("score:" + score);
-
         (new StudentAttempt(
                 score,
                 student,
                 quiz
         )).save();
-        Home home = Home.getInstance(student, true);
-        home.refresh();
-        home.setVisible(true);
-        dispose();
 
-
+        Home.cardLayout.show(Home.cardPanel , "QUIZZES");
         return null;
     }
 

@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.EventListener;
 
 public class StudentPanel extends JPanel {
 
@@ -138,27 +139,21 @@ public class StudentPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                try {
-                    Student student = Student.findByCin(cinField.getText());
-                    if (student != null) {
-
-
-                        Home home = new Home(student);
-                        home.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-
-//                        JOptionPane.showMessageDialog(StudentPanel.this, student.getFull_name());
-//                        JOptionPane.showMessageDialog(StudentPanel.this, student.getId());
-                    } else {
-
-                        if (
-                                nomField.getText().isEmpty() ||
-                                        cinField.getText().isEmpty() ||
-                                        gradeCombobox.getSelectedItem().toString().isEmpty() ||
-                                        majorCombobox.getSelectedItem().toString().isEmpty()
-                        ) {
-                            JOptionPane.showMessageDialog(StudentPanel.this, "all filed are required");
-                        } else {
-
+                if (
+                        nomField.getText().isEmpty() ||
+                                cinField.getText().isEmpty() ||
+                                gradeCombobox.getSelectedItem().toString().isEmpty() ||
+                                majorCombobox.getSelectedItem().toString().isEmpty()
+                ) {
+                    JOptionPane.showMessageDialog(StudentPanel.this, "all filed are required");
+                }
+                else {
+                    try {
+                        Student student = Student.findByCin(cinField.getText());
+                        if (student != null) {
+                            Home home = new Home(student);
+                            home.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+                        }else {
                             Student createdStudent = new Student();
                             createdStudent.setFull_name(nomField.getText());
                             createdStudent.setCin(cinField.getText());
@@ -169,13 +164,14 @@ public class StudentPanel extends JPanel {
 
                             Home home = new Home(createdStudent);
                             home.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-//                            JOptionPane.showMessageDialog(StudentPanel.this, "student created succesfully!");
                         }
-
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
                     }
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
                 }
+
+
+
 
             }
         };

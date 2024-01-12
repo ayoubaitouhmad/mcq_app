@@ -17,6 +17,18 @@ public class Quiz extends Model {
     private String targetCategory;
 
 
+
+
+    public static Quiz find(int quizId) throws SQLException {
+        for (Quiz quiz : all()) {
+            if (quiz.getId() == quizId) {
+                return quiz;
+            }
+        }
+        return null;
+    }
+
+
     public String getName(Student student) throws SQLException {
         int score = 0;
         if (student != null) {
@@ -127,7 +139,7 @@ public class Quiz extends Model {
     }
 
     private static String successfulStudentsQuery() {
-        return "select s.* , student_attempts.score from student_attempts join db_mcq.students s on s.id = student_attempts.student join db_mcq.quizzes q on q.id = student_attempts.quiz where q.id = ?";
+        return "select s.* ,student_attempts.id as student_attempt_id  from student_attempts join db_mcq.students s on s.id = student_attempts.student join db_mcq.quizzes q on q.id = student_attempts.quiz where q.id = ?";
     }
 
     public List<Student> getSuccessfulStudents() throws SQLException {
@@ -146,7 +158,10 @@ public class Quiz extends Model {
                     resultSet.getInt("id"),
                     resultSet.getString("full_name"),
                     resultSet.getString("major"),
-                    resultSet.getString("grade")
+                    resultSet.getString("grade"),
+                    resultSet.getString("cin"),
+                   this,
+                    StudentAttempt.find(resultSet.getInt("student_attempt_id"))
             ));
         }
 
