@@ -15,13 +15,9 @@ import java.sql.SQLException;
 public class Main {
 
     public static void main(String[] args) throws SQLException {
-
-//        DatabaseConnection.importDataBase();
-//        DatabaseConnection.insertData();
-//        Index.getInstance();
-//     new Home(Professor.first());
-     new main.java.com.qcm.frames.student.Home(Student.first());
-//        new StartQuiz(Quiz.all().getFirst() , Student.first());
+        DatabaseConnection.importDataBase();
+        DatabaseConnection.insertData();
+        Index.getInstance();
     }
 
 }
