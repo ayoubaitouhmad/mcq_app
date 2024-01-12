@@ -99,8 +99,8 @@ CREATE TABLE IF NOT EXISTS `student_attempts`
     UNIQUE KEY `id` (`id`),
     KEY `student` (`student`),
     KEY `quiz` (`quiz`),
-    CONSTRAINT `student_attempts_ibfk_1` FOREIGN KEY (`student`) REFERENCES `students` (`id`),
-    CONSTRAINT `student_attempts_ibfk_2` FOREIGN KEY (`quiz`) REFERENCES `quizzes` (`id`)
+    CONSTRAINT `student_attempts_ibfk_1` FOREIGN KEY (`student`) REFERENCES `students` (`id`)  ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `student_attempts_ibfk_2` FOREIGN KEY (`quiz`) REFERENCES `quizzes` (`id`)  ON DELETE CASCADE ON UPDATE CASCADE
 )
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_0900_ai_ci;
