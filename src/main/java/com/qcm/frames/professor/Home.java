@@ -4,10 +4,7 @@ import main.java.com.qcm.Index;
 import main.java.com.qcm.model.Professor;
 import main.java.com.qcm.model.Quiz;
 import main.java.com.qcm.model.Student;
-import main.java.com.qcm.panel.ProfessorPanel;
-import main.java.com.qcm.panel.StudentPanel;
-import main.java.com.qcm.panel.professor.QuizList;
-import main.java.com.qcm.panel.professor.QuizUsers;
+import main.java.com.qcm.util.Component;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -37,10 +34,8 @@ public class Home extends JFrame {
         this.professor = professor;
 
 
-        setTitle("Professor");
-        setSize(700, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        Component.jFrame(this , "Professor Dashboard");
+
         menu();
         professorInfo();
 
@@ -194,23 +189,22 @@ public class Home extends JFrame {
             }
         };
 
-        tableModel.addColumn("id");
+        tableModel.addColumn("Reference");
         tableModel.addColumn("cin");
         tableModel.addColumn("fullname");
         tableModel.addColumn("major");
         tableModel.addColumn("grade");
         tableModel.addColumn("score");
-        tableModel.addColumn("status");
+        tableModel.addColumn("Decision");
         for (Student student : quiz.getSuccessfulStudents()) {
-            int score = student.quizScore(quiz.getId());
             Object[] rowData = {
-                    student.getId(),
+                   "#"+ student.getId(),
                     student.getCin(),
                     student.getFull_name(),
                     student.getMajor(),
                     student.getGrade() ,
-                    score,
-                    score>=10 ? "passed" : "failed",
+                    student.studentAttempt.getScore(),
+                    student.studentAttempt.result(),
             };
             tableModel.addRow(rowData);
         }
@@ -243,14 +237,13 @@ public class Home extends JFrame {
 //        tableModel.addColumn("created at");
         for (Student student : Student.all()) {
 
+            System.out.println(student.getCin());
             Object[] rowData = {
-                    student.getId(),
+                    "#"+student.getId(),
                     student.getCin(),
                     student.getFull_name(),
                     student.getMajor(),
                     student.getGrade() ,
-//                    student.getC() ,
-
             };
             tableModel.addRow(rowData);
         }
